@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Video;
 use App\Models\WebsiteLink;
+use App\Models\WorkSchedule;
 
 class HomeController extends Controller
 {
@@ -18,7 +19,14 @@ class HomeController extends Controller
         | Tin nổi bật
         |--------------------------------------------------------------------------
         */
-
+$workSchedules = WorkSchedule::where('status', true)
+    ->whereDate('work_date', '>=', now()->startOfWeek())
+    ->whereDate('work_date', '<=', now()->endOfWeek())
+    ->orderBy('work_date')
+    ->orderBy('start_time')
+    ->orderBy('sort_order')
+    ->take(10)
+    ->get();
         $featuredPosts = Post::with(['categories', 'author'])
             ->where('status', 'published')
             ->where('is_featured', true)
@@ -123,7 +131,8 @@ class HomeController extends Controller
             'homeBanners',
             'sidebarBanners',
             'homeVideo',
-            'websiteLinks'
+            'websiteLinks',
+            'workSchedules'
         ));
     }
 }

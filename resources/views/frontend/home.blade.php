@@ -246,6 +246,71 @@
                 @endforelse
             </div>
         </div>
+        {{-- LỊCH CÔNG TÁC --}}
+<div class="sidebar-box work-schedule-box">
+    <div class="sidebar-title">
+        Lịch công tác
+    </div>
+
+    <div class="sidebar-body">
+
+        @if(isset($workSchedules) && $workSchedules->count() > 0)
+
+            <div class="work-schedule-list">
+
+                @foreach($workSchedules as $schedule)
+
+                    <div class="work-schedule-item">
+
+                        <div class="work-schedule-date">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            {{ $schedule->work_date?->format('d/m/Y') }}
+                        </div>
+
+                        <div class="work-schedule-time">
+                            @if($schedule->start_time)
+                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
+                            @endif
+
+                            @if($schedule->end_time)
+                                -
+                                {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                            @endif
+                        </div>
+
+                        <div class="work-schedule-title">
+                            {{ $schedule->title }}
+                        </div>
+
+                        @if($schedule->location)
+                            <div class="work-schedule-location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ $schedule->location }}
+                            </div>
+                        @endif
+
+                    </div>
+
+                @endforeach
+
+            </div>
+            <div class="work-schedule-more">
+    <a href="{{ route('frontend.work_schedules.index') }}">
+        Xem toàn bộ lịch công tác
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+</div>
+
+        @else
+
+            <div class="work-schedule-empty">
+                Đang cập nhật lịch công tác.
+            </div>
+
+        @endif
+
+    </div>
+</div>
 
      <div class="sidebar-box video-box">
     <div class="sidebar-title">

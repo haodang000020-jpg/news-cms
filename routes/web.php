@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\PageController as FrontendPageController;
 use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\TagController as FrontendTagController;
+use App\Http\Controllers\Frontend\WorkScheduleController as FrontendWorkScheduleController;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\WebsiteLinkController;
 use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\Admin\WorkScheduleController;
 
 
 /*
@@ -42,11 +44,15 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])
 Route::get('/search', [SearchController::class, 'index'])
     ->name('frontend.search');
 
+Route::get('/lich-cong-tac', [FrontendWorkScheduleController::class, 'index'])
+    ->name('frontend.work_schedules.index');
+
 Route::get('/posts/{slug}', [FrontendPostController::class, 'show'])
     ->name('frontend.posts.show');
 
 Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])
     ->name('frontend.categories.show');
+    
 
 
 /*
@@ -125,6 +131,9 @@ Route::delete('posts/{id}/force-delete', [PostController::class, 'forceDelete'])
         Route::patch('posts/{post}/draft', [PostController::class, 'draft'])
             ->middleware('permission:post.publish')
             ->name('posts.draft');
+
+        Route::middleware('permission:page.manage')
+    ->resource('work-schedules', WorkScheduleController::class);
 
         Route::middleware('permission:banner.manage')
             ->resource('banners', BannerController::class);

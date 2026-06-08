@@ -45,15 +45,21 @@
 
                 <span>|</span>
 
-                <a href="/sitemap.xml" target="_blank">
+                <a href="{{ route('sitemap') }}" target="_blank">
                     Sitemap
                 </a>
 
                 <span>|</span>
 
-                <a href="{{ route('login') }}">
-                    Đăng nhập
-                </a>
+                @auth
+                    <a href="/admin">
+                        Quản trị
+                    </a>
+                @else
+                    <a href="{{ route('login') }}">
+                        Đăng nhập
+                    </a>
+                @endauth
             </div>
 
         </div>
@@ -64,11 +70,11 @@
         <div class="site-container header-inner">
 
             <div class="header-logo">
-                <img src="{{ asset('frontend/images/logo.png') }}"
-                     alt="Logo">
+                <a href="{{ route('home') }}">
+                    <img src="{{ asset('frontend/images/logo.png') }}"
+                         alt="Phòng Kinh tế, Văn hóa và Xã hội xã Vĩnh Bình">
+                </a>
             </div>
-
-            
 
         </div>
     </header>
@@ -77,29 +83,68 @@
     <nav class="main-menu">
         <div class="site-container">
 
+            @php
+                $mainMenus = \App\Models\Menu::with([
+                        'children' => function ($query) {
+                            $query->where('status', true)
+                                  ->orderBy('sort_order');
+                        },
+                        'category',
+                        'children.category'
+                    ])
+                    ->whereNull('parent_id')
+                    ->where('status', true)
+                    ->orderBy('sort_order')
+                    ->get();
+            @endphp
+
             <ul class="main-menu-list">
 
-                <li>
-                    <a href="{{ route('home') }}">
-                        <i class="fa-solid fa-house"></i>
-                    </a>
-                </li>
+                @forelse($mainMenus as $menu)
 
-                @php
-                    $menuCategories = \App\Models\Category::whereNull('parent_id')
-                        ->where('status', true)
-                        ->orderBy('sort_order')
-                        ->take(7)
-                        ->get();
-                @endphp
+                    <li class="{{ $menu->children->count() > 0 ? 'has-submenu' : '' }}">
 
-                @foreach($menuCategories as $category)
+                        <a href="{{ $menu->link ?? '#' }}"
+                           target="{{ $menu->target ?? '_self' }}">
+
+                            @if($loop->first && ($menu->url === '/' || mb_strtolower($menu->title) === 'trang chủ'))
+                                <i class="fa-solid fa-house"></i>
+                            @else
+                                {{ $menu->title }}
+                            @endif
+
+                        </a>
+
+                        @if($menu->children->count() > 0)
+
+                            <ul class="submenu">
+
+                                @foreach($menu->children as $child)
+
+                                    <li>
+                                        <a href="{{ $child->link ?? '#' }}"
+                                           target="{{ $child->target ?? '_self' }}">
+                                            {{ $child->title }}
+                                        </a>
+                                    </li>
+
+                                @endforeach
+
+                            </ul>
+
+                        @endif
+
+                    </li>
+
+                @empty
+
                     <li>
-                        <a href="{{ route('frontend.categories.show', $category->slug) }}">
-                            {{ $category->name }}
+                        <a href="{{ route('home') }}">
+                            <i class="fa-solid fa-house"></i>
                         </a>
                     </li>
-                @endforeach
+
+                @endforelse
 
             </ul>
 
@@ -116,6 +161,7 @@
             </div>
 
             <div class="headline-marquee">
+
                 @php
                     $runningPosts = \App\Models\Post::where('status', 'published')
                         ->latest('published_at')
@@ -123,14 +169,23 @@
                         ->get();
                 @endphp
 
-                <marquee behavior="scroll" direction="left" scrollamount="4">
-                    @foreach($runningPosts as $post)
-                        <a href="{{ route('frontend.posts.show', $post->slug) }}">
-                            {{ $post->title }}
-                        </a>
-                        &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
-                    @endforeach
-                </marquee>
+                @if($runningPosts->count() > 0)
+
+                    <marquee behavior="scroll" direction="left" scrollamount="4">
+                        @foreach($runningPosts as $post)
+                            <a href="{{ route('frontend.posts.show', $post->slug) }}">
+                                {{ $post->title }}
+                            </a>
+                            &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                        @endforeach
+                    </marquee>
+
+                @else
+
+                    <span>Đang cập nhật thông tin.</span>
+
+                @endif
+
             </div>
 
             <form action="{{ route('frontend.search') }}"
@@ -142,7 +197,7 @@
                        value="{{ request('keyword') }}"
                        placeholder="Tìm kiếm...">
 
-                <button>
+                <button type="submit">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
 
@@ -193,7 +248,40 @@
     </footer>
 
 </div>
+{{-- FLOATING CONTACT BUTTONS --}}
+<div class="floating-contact">
 
+    <a href="tel:0123456789"
+       class="floating-contact-item phone"
+       title="Gọi điện">
+        <i class="fa-solid fa-phone"></i>
+        <span>Gọi điện</span>
+    </a>
+
+    <a href="https://zalo.me/0123456789"
+       class="floating-contact-item zalo"
+       target="_blank"
+       title="Chat Zalo">
+        <strong>Zalo</strong>
+        <span>Chat Zalo</span>
+    </a>
+
+    <a href="https://m.me/yourpage"
+       class="floating-contact-item messenger"
+       target="_blank"
+       title="Messenger">
+        <i class="fa-brands fa-facebook-messenger"></i>
+        <span>Messenger</span>
+    </a>
+
+    <a href="/lien-he"
+       class="floating-contact-item feedback"
+       title="Gửi góp ý">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Góp ý</span>
+    </a>
+
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const selects = document.querySelectorAll('[data-open-link]');

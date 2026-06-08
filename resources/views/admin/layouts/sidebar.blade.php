@@ -37,6 +37,15 @@
                 </li>
             @endif
 
+            @if(auth()->user()->hasPermission('page.manage'))
+    <li class="nav-item">
+        <a class="nav-link text-white"
+           href="{{ route('work-schedules.index') }}">
+            <i class="fa-solid fa-calendar-days me-1"></i>
+            Lịch công tác
+        </a>
+    </li>
+@endif
             @if(auth()->user()->hasPermission('post.create'))
                 <li class="nav-item">
                    <a class="nav-link {{ request()->is('admin/posts') || request()->is('admin/posts/*') ? 'active' : '' }}"
