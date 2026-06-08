@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\WebsiteLinkController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\WorkScheduleController;
+use App\Http\Controllers\Admin\RealtimeNotificationController;
 
 
 /*
@@ -173,6 +174,10 @@ Route::post('notifications/mark-all-read', [NotificationController::class, 'mark
     Route::middleware('permission:setting.manage')
     ->resource('videos', VideoController::class);
 
+
+
+    Route::get('realtime-notifications/check', [RealtimeNotificationController::class, 'check'])
+    ->name('admin.realtime_notifications.check');
     });
 
 
